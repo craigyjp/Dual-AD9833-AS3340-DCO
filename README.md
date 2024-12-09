@@ -12,20 +12,22 @@ I experimented with injecting the triangle (amplified) of the AD9833 into the AS
 Based on this and an RP2040 controlling the AD8933 frequencies it was possible to construct a MIDI controlled dual DCO with upto 8 waveform outputs. 
 2 saw, 2 PWM, 2 triangle and 2 sub outputs.
 
-* The specifications are as follows
+# The specifications are as follows
 
-MIDI controlled
-Dual oscillators 
-Osc2 Detune
-Osc2 Interval 0-12 semitones
-FM input 0-3.3v (center 0 modulation)
-Sawtooth 0-10v X2
-PWM 0-10V X2
-Triangle 0-10v X2
-Sub oscillator 0-10v X2
-Velocity output 0-5V
-CV output 0-5V
-Oscillator Sync (not tested yet)
+* MIDI controlled
+* Dual oscillators 
+* Osc2 Detune
+* Osc2 Interval 0-12 semitones
+* FM input 0-3.3v (center 0 modulation)
+* Sawtooth 0-10v X2
+* PWM 0-10V X2
+* Triangle 0-10v X2
+* Sub oscillator 0-10v X2
+* Velocity output 0-5V
+* CV output 0-5V
+* Oscillator Sync (not tested yet)
+* Pitchbend +/- 1 octave
+* Octave select -/0/+ 1 octave per DCO
 
 
 
