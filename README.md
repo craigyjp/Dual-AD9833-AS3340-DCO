@@ -16,8 +16,8 @@ Based on this and an RP2040 controlling the AD8933 frequencies it was possible t
 
 * MIDI controlled
 * Dual oscillators 
-* Osc2 Detune
-* Osc2 Interval 0-12 semitones
+* Osc2 Detune (MIDI controlled)
+* Osc2 Interval 0-12 semitones (MIDI controlled)
 * FM input 0-3.3v (center 0 modulation)
 * Sawtooth 0-10v X2
 * PWM 0-10V X2
@@ -26,8 +26,9 @@ Based on this and an RP2040 controlling the AD8933 frequencies it was possible t
 * Velocity output 0-5V
 * CV output 0-5V
 * Oscillator Sync (not tested yet)
-* Pitchbend +/- 1 octave
-* Octave select -/0/+ 1 octave per DCO
+* Pitchbend +/- 1 octave (MIDI controlled)
+* Octave select -/0/+ 1 octave per DCO (MIDI controlled)
+* Glide (MIDI controlled)
 
 
 
