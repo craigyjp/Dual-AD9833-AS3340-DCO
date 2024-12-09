@@ -1,6 +1,6 @@
 # Dual-AD9833-AS3340-DCO
 
-* Pico controlled AD9833 dual DCO with AS3340 waveshaping
+Pico controlled AD9833 dual DCO with AS3340 waveshaping
 
 Searching for a stable DCO with sawtooth, PWM, triangle and SUB waveforms.
 I was watching a video on the CEM3340 and it's waveshaping capabilities.
