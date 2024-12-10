@@ -36,6 +36,9 @@ unsigned long interval1;
 int adcValue;
 float modulation = 1.00;
 float fmModulation = 1.00;
+bool keytrack_on = false;
+int keytrack = 0;
+int keytrack_pitch = 0;
 
 unsigned long TRIG_START = 0; // Timestamp for the start of the trigger pulse
 const unsigned long TRIG_LENGTH = 10; // Duration of the trigger pulse in milliseconds

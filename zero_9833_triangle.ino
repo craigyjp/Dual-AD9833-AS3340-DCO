@@ -81,14 +81,12 @@ void myControlChange(byte channel, byte control, byte value) {
     case 65:                         // Glide on/off
       glideEnabled = (value >= 64);  // Turn on if value >= 64
       break;
-    case 18:
-      detune = map(value, 0, 127, 0, 15);
-      break;
+
     case 17:
       oct_sel1 = map(value, 0, 127, 0, 2);
       switch (oct_sel1) {
         case 0:
-          oct_sw1 = 0.5;
+          oct_sw1 = 0.5;DC
           break;
         case 1:
           oct_sw1 = 1;
@@ -98,6 +96,11 @@ void myControlChange(byte channel, byte control, byte value) {
           break;
       }
       break;
+
+    case 18:
+      detune = map(value, 0, 127, 0, 15);
+      break;
+
     case 19:
       oct_sel2 = map(value, 0, 127, 0, 2);
       switch (oct_sel2) {
@@ -112,13 +115,27 @@ void myControlChange(byte channel, byte control, byte value) {
           break;
       }
       break;
+
     case 20:
       interval = value;
       if (interval > 12) {
         interval = 12;
       }
       break;
-    case 21:                         // Sync on/off
+
+    case 21:
+      // Keytrack 0-127
+      keytrack = value;
+      update_keytrack(keytrack_pitch);
+      break;
+
+    case 22:
+      // Keytrack on/off
+      keytrack_on = (value >= 64);
+      update_keytrack(keytrack_pitch);
+      break;
+
+    case 23:                        // Sync on/off
       syncEnabled = (value >= 64);  // Turn on if value >= 64
       if (syncEnabled) {
         digitalWrite(SYNC_PIN, HIGH);
@@ -129,47 +146,60 @@ void myControlChange(byte channel, byte control, byte value) {
   }
 }
 
-void DinHandleNoteOn(byte channel, byte pitch, byte velocity) {
-  if (channel == MIDI_CHANNEL) {
-    if (velocity == 0) {
-      // Treat velocity 0 as Note Off
-      DinHandleNoteOff(channel, pitch, velocity);
-      return;
-    }
+void update_keytrack(byte pitch) {
 
-    // Set PWM duty cycle for velocity
-    int velocityDutyCycle = map(velocity, 0, 127, 0, 255);  // Map velocity to 8-bit range
-    analogWrite(VELOCITY_PWM_PIN, velocityDutyCycle);
+    int noteDutyCycle;
 
-    // Set PWM duty cycle for note value
-    int noteDutyCycle = map(pitch, 0, 127, 0, 255);  // Map note value to 8-bit range
-    analogWrite(NOTE_PWM_PIN, noteDutyCycle);
-
-    // Setup glide parameters
-    if (glideEnabled) {
-      glideStartFrequency1 = currentGlideFrequency1;
-      glideStartFrequency2 = currentGlideFrequency2;
-      glideTargetFrequency1 = notes[(pitch - MIDI_NOTE_START)];
-      glideTargetFrequency2 = notes[(pitch - MIDI_NOTE_START)];  // Base note without interval
-      isGliding = true;
+    if (keytrack_on) {
+        // Scale note value based on keytrack
+        int scaledValue = map(keytrack, 0, 127, 0, 100);  // Scale keytrack to a percentage (0-100%)
+        noteDutyCycle = map(pitch * scaledValue / 100, 0, 127, 0, 255);  // Apply scaling to pitch and map to PWM range
     } else {
-      // No glide, set directly
-      glideTargetFrequency1 = notes[(pitch - MIDI_NOTE_START)];
-      glideTargetFrequency2 = notes[(pitch - MIDI_NOTE_START)];  // Base note without interval
-      currentGlideFrequency1 = glideTargetFrequency1;
-      currentGlideFrequency2 = glideTargetFrequency2;
-      isGliding = false;
+        // Turn off the keytrack
+        noteDutyCycle = 0;  
     }
 
-    noteon = pitch;  // Store the active note
-
-    digitalWrite(TRIG_PIN, HIGH);
-    TRIG_START = millis();       // Record the timestamp
-    digitalWrite(GATE_PIN, HIGH);
-    
-  }
+    analogWrite(NOTE_PWM_PIN, noteDutyCycle);  // Set the PWM output
 }
 
+void DinHandleNoteOn(byte channel, byte pitch, byte velocity) {
+    if (channel == MIDI_CHANNEL) {
+        if (velocity == 0) {
+            // Treat velocity 0 as Note Off
+            DinHandleNoteOff(channel, pitch, velocity);
+            return;
+        }
+
+        keytrack_pitch = pitch;
+        update_keytrack(keytrack_pitch);
+
+        // Set PWM duty cycle for velocity
+        int velocityDutyCycle = map(velocity, 0, 127, 0, 255);  // Map velocity to 8-bit range
+        analogWrite(VELOCITY_PWM_PIN, velocityDutyCycle);
+
+        // Setup glide parameters
+        if (glideEnabled) {
+            glideStartFrequency1 = currentGlideFrequency1;
+            glideStartFrequency2 = currentGlideFrequency2;
+            glideTargetFrequency1 = notes[(pitch - MIDI_NOTE_START)];
+            glideTargetFrequency2 = notes[(pitch - MIDI_NOTE_START)];  // Base note without interval
+            isGliding = true;
+        } else {
+            // No glide, set directly
+            glideTargetFrequency1 = notes[(pitch - MIDI_NOTE_START)];
+            glideTargetFrequency2 = notes[(pitch - MIDI_NOTE_START)];  // Base note without interval
+            currentGlideFrequency1 = glideTargetFrequency1;
+            currentGlideFrequency2 = glideTargetFrequency2;
+            isGliding = false;
+        }
+
+        noteon = pitch;  // Store the active note
+
+        digitalWrite(TRIG_PIN, HIGH);
+        TRIG_START = millis();  // Record the timestamp
+        digitalWrite(GATE_PIN, HIGH);
+    }
+}
 
 void DinHandleNoteOff(byte channel, byte note, byte velocity) {
   if (channel == MIDI_CHANNEL) {
