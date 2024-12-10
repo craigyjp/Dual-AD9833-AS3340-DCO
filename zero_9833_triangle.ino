@@ -34,6 +34,9 @@ void setup() {
   analogWrite(VELOCITY_PWM_PIN, 0);
   analogWrite(NOTE_PWM_PIN, 0);
 
+  pinMode(SYNC_PIN, OUTPUT);
+  digitalWrite(SYNC_PIN, LOW);
+
   MIDI.begin(0);
   MIDI.setHandleControlChange(myControlChange);
   MIDI.setHandleNoteOn(DinHandleNoteOn);
@@ -106,6 +109,14 @@ void myControlChange(byte channel, byte control, byte value) {
       interval = value;
       if (interval > 12) {
         interval = 12;
+      }
+      break;
+    case 21:                         // Sync on/off
+      syncEnabled = (value >= 64);  // Turn on if value >= 64
+      if (syncEnabled) {
+        digitalWrite(SYNC_PIN, HIGH);
+      } else {
+        digitalWrite(SYNC_PIN, LOW);
       }
       break;
   }

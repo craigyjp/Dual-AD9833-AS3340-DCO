@@ -12,6 +12,8 @@ const int TRIANGLE = 0x2002;                // define the waveform when we end w
 #define VELOCITY_PWM_PIN 12 // PWM output for velocity
 #define NOTE_PWM_PIN 13     // PWM output for note value
 
+#define SYNC_PIN 14
+
 
 unsigned long lastToggle1 = 0; // Timestamp for GPIO 10
 unsigned long lastToggle2 = 0; // Timestamp for GPIO 11
@@ -19,6 +21,7 @@ unsigned long lastToggle2 = 0; // Timestamp for GPIO 11
 int detune = 0;
 int noteVal = 0;
 int interval = 0;
+bool syncEnabled = false;
 int type, channel, d1, d2;
 byte noteon = 36;
 double bend_factor = 0.0001;
