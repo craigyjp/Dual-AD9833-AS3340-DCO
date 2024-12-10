@@ -30,6 +30,8 @@ Based on this and an RP2040 controlling the AD8933 frequencies it was possible t
 * Octave select -/0/+ 1 octave per DCO (MIDI controlled)
 * Glide (MIDI controlled)
 * PWM CV input 0-10V x2
+* Gate output
+* Trig output (10mS)
 
 
 
