@@ -25,7 +25,7 @@ Based on this and an RP2040 controlling the AD8933 frequencies it was possible t
 * Sub oscillator 0-10v x2
 * Velocity output 0-5V
 * CV output 0-5V
-* Oscillator Sync (not tested yet)
+* Oscillator Sync based on P600 softsync
 * Pitchbend +/- 1 octave (MIDI controlled)
 * Octave select -/0/+ 1 octave per DCO (MIDI controlled)
 * Glide (MIDI controlled)
