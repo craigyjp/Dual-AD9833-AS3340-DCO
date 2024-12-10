@@ -19,6 +19,13 @@ void setup() {
 
   analogReadResolution(12);
 
+  pinMode(GATE_PIN, OUTPUT);  // gate output
+  pinMode(TRIG_PIN, OUTPUT);  // trig output 2
+
+  // Initialize pins to LOW
+  digitalWrite(GATE_PIN, LOW);
+  digitalWrite(TRIG_PIN, LOW);
+
   pinMode(SUB_OUT1, OUTPUT);  // Square wave output 1
   pinMode(SUB_OUT2, OUTPUT);  // Square wave output 2
 
@@ -155,12 +162,18 @@ void DinHandleNoteOn(byte channel, byte pitch, byte velocity) {
     }
 
     noteon = pitch;  // Store the active note
+
+    digitalWrite(TRIG_PIN, HIGH);
+    TRIG_START = millis();       // Record the timestamp
+    digitalWrite(GATE_PIN, HIGH);
+    
   }
 }
 
 
 void DinHandleNoteOff(byte channel, byte note, byte velocity) {
   if (channel == MIDI_CHANNEL) {
+    digitalWrite(GATE_PIN, LOW);
   }
 }
 
@@ -188,6 +201,10 @@ float mapToExponential(float x, float exponent) {
 
 void loop() {
   MIDI.read();  // Handle MIDI events
+
+  if (millis() - TRIG_START >= TRIG_LENGTH) {
+    digitalWrite(TRIG_PIN, LOW);
+  }
 
   // Read FM input
   adcValue = analogRead(ADC0_PIN);

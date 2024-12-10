@@ -6,14 +6,16 @@ const int TRIANGLE = 0x2002;                // define the waveform when we end w
 #define ADC_CENTER 2048    // Center of the ADC range for 1.65V (12-bit ADC)
 #define FM_RANGE 1.0       // Modulation range (1 octave up or down)
 
+#define SYNC_PIN 7
+
 #define SUB_OUT1 10
 #define SUB_OUT2 11
 
 #define VELOCITY_PWM_PIN 12 // PWM output for velocity
 #define NOTE_PWM_PIN 13     // PWM output for note value
 
-#define SYNC_PIN 14
-
+#define GATE_PIN 14
+#define TRIG_PIN 15
 
 unsigned long lastToggle1 = 0; // Timestamp for GPIO 10
 unsigned long lastToggle2 = 0; // Timestamp for GPIO 11
@@ -34,6 +36,9 @@ unsigned long interval1;
 int adcValue;
 float modulation = 1.00;
 float fmModulation = 1.00;
+
+unsigned long TRIG_START = 0; // Timestamp for the start of the trigger pulse
+const unsigned long TRIG_LENGTH = 10; // Duration of the trigger pulse in milliseconds
 
 // Global variables for portamento
 unsigned long lastGlideTime = 0;
