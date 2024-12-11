@@ -6,6 +6,7 @@ const int TRIANGLE = 0x2002;                // define the waveform when we end w
 #define ADC_CENTER 2048    // Center of the ADC range for 1.65V (12-bit ADC)
 #define FM_RANGE 1.0       // Modulation range (1 octave up or down)
 
+#define LED_PIN 6
 #define SYNC_PIN 7
 
 #define SUB_OUT1 10

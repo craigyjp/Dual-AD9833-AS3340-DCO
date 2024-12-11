@@ -10,8 +10,8 @@ AD9833 Waveform Module
 
 #define MIDI_CHANNEL 1
 
-AD9833 AD(5, 3, 6);   //  SW SPI over the HW SPI pins (UNO);
-AD9833 AD1(9, 3, 6);  //  SW SPI over the HW SPI pins (UNO);
+AD9833 AD(5, 3, 2);   //  SW SPI over the HW SPI pins (UNO);
+AD9833 AD1(9, 3, 2);  //  SW SPI over the HW SPI pins (UNO);
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
@@ -20,11 +20,13 @@ void setup() {
   analogReadResolution(12);
 
   pinMode(GATE_PIN, OUTPUT);  // gate output
-  pinMode(TRIG_PIN, OUTPUT);  // trig output 2
+  pinMode(TRIG_PIN, OUTPUT);  // trig output
+  pinMode(LED_PIN, OUTPUT);   // led output
 
   // Initialize pins to LOW
   digitalWrite(GATE_PIN, LOW);
   digitalWrite(TRIG_PIN, LOW);
+  digitalWrite(LED_PIN, LOW);
 
   pinMode(SUB_OUT1, OUTPUT);  // Square wave output 1
   pinMode(SUB_OUT2, OUTPUT);  // Square wave output 2
@@ -86,7 +88,7 @@ void myControlChange(byte channel, byte control, byte value) {
       oct_sel1 = map(value, 0, 127, 0, 2);
       switch (oct_sel1) {
         case 0:
-          oct_sw1 = 0.5;DC
+          oct_sw1 = 0.5;
           break;
         case 1:
           oct_sw1 = 1;
@@ -198,12 +200,14 @@ void DinHandleNoteOn(byte channel, byte pitch, byte velocity) {
         digitalWrite(TRIG_PIN, HIGH);
         TRIG_START = millis();  // Record the timestamp
         digitalWrite(GATE_PIN, HIGH);
+        digitalWrite(LED_PIN, HIGH);
     }
 }
 
 void DinHandleNoteOff(byte channel, byte note, byte velocity) {
   if (channel == MIDI_CHANNEL) {
     digitalWrite(GATE_PIN, LOW);
+    digitalWrite(LED_PIN, LOW);
   }
 }
 
