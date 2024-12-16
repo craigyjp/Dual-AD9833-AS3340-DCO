@@ -9,8 +9,8 @@ It seems that it is a triangle core with waveshaping for it's ouputs.
 The AD9833 is capable of triangle, square and sine wave outputs, all of which are difficult to convert to a sawtooth.
 I experimented with injecting the triangle (amplified) of the AD9833 into the AS3340 triangle input buffer and eventually found a signal that triggered the wave conversion.
 
-Based on this and an RP2040 controlling the AD8933 frequencies it was possible to construct a MIDI controlled dual DCO with upto 8 waveform outputs. 
-2 saw, 2 PWM, 2 triangle and 2 sub outputs.
+Based on this and an RP2040 controlling the AD8933 frequencies it was possible to construct a MIDI controlled dual DCO with upto 6 waveform outputs. 
+2 saw, 2 PWM, 1 triangle and 1 sub output.
 
 # The specifications are as follows
 
@@ -19,10 +19,11 @@ Based on this and an RP2040 controlling the AD8933 frequencies it was possible t
 * Osc2 Detune (MIDI controlled)
 * Osc2 Interval 0-12 semitones (MIDI controlled)
 * FM input 0-3.3v (center 0 modulation)
+* PolyMod DCO1 input 0-3.3v (center 0  poly modulation)
 * Sawtooth 0-10v x2
 * PWM 0-10V x2
-* Triangle 0-10v x2
-* Sub oscillator 0-10v x2
+* Triangle 0-10v x1 (DCO2)
+* Sub oscillator 0-10v x1 (DCO1)
 * Velocity output 0-5V
 * Keytrack CV output 0-5V
 * Keytrack scaling and on/off
