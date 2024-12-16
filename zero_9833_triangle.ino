@@ -7,6 +7,7 @@ AD9833 Waveform Module
 #include "Parameters.h"
 #include <MIDI.h>
 #include "AD9833.h"
+#include <hardware/pwm.h>
 
 #define MIDI_CHANNEL 1
 
@@ -18,6 +19,8 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 void setup() {
 
   analogReadResolution(12);
+  analogWriteFreq(10000);
+  analogWriteRange(256);
 
   pinMode(GATE_PIN, OUTPUT);  // gate output
   pinMode(TRIG_PIN, OUTPUT);  // trig output
@@ -29,19 +32,27 @@ void setup() {
   digitalWrite(LED_PIN, LOW);
 
   pinMode(SUB_OUT1, OUTPUT);  // Square wave output 1
-  pinMode(SUB_OUT2, OUTPUT);  // Square wave output 2
 
   // Initialize pins to LOW
   digitalWrite(SUB_OUT1, LOW);
-  digitalWrite(SUB_OUT2, LOW);
 
   // Configure PWM pins as outputs
   pinMode(VELOCITY_PWM_PIN, OUTPUT);
   pinMode(NOTE_PWM_PIN, OUTPUT);
 
+  pinMode(PW1_PIN, OUTPUT);
+  pinMode(PW2_PIN, OUTPUT);
+  pinMode(PWM1_PIN, OUTPUT);
+  pinMode(PWM2_PIN, OUTPUT);
+
   // Set initial PWM duty cycle to 0
   analogWrite(VELOCITY_PWM_PIN, 0);
   analogWrite(NOTE_PWM_PIN, 0);
+
+  analogWrite(PW1_PIN, 0);
+  analogWrite(PWM1_PIN, 0);
+  analogWrite(PW2_PIN, 0);
+  analogWrite(PWM2_PIN, 0);
 
   pinMode(SYNC_PIN, OUTPUT);
   digitalWrite(SYNC_PIN, LOW);
@@ -84,6 +95,10 @@ void myControlChange(byte channel, byte control, byte value) {
       glideEnabled = (value >= 64);  // Turn on if value >= 64
       break;
 
+    case 16:
+      detune = map(value, 0, 127, 0, 15);
+      break; 
+
     case 17:
       oct_sel1 = map(value, 0, 127, 0, 2);
       switch (oct_sel1) {
@@ -100,10 +115,6 @@ void myControlChange(byte channel, byte control, byte value) {
       break;
 
     case 18:
-      detune = map(value, 0, 127, 0, 15);
-      break;
-
-    case 19:
       oct_sel2 = map(value, 0, 127, 0, 2);
       switch (oct_sel2) {
         case 0:
@@ -145,12 +156,38 @@ void myControlChange(byte channel, byte control, byte value) {
         digitalWrite(SYNC_PIN, LOW);
       }
       break;
+
+      case 24:
+          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          PW1_duty = map(value, 0, 127, 0, 256);
+          analogWrite(PW1_PIN, PW1_duty);
+          }
+      break;
+
+      case 25:
+          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          PW2_duty = map(value, 0, 127, 0, 256);
+          analogWrite(PW2_PIN, PW2_duty);
+          }
+      break;
+
+      case 26:
+          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          PWM1_depth = map(value, 0, 127, 0, 156);
+          analogWrite(PWM1_PIN, PWM1_depth);
+          }
+      break;
+
+      case 27:
+          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          PWM2_depth = map(value, 0, 127, 0, 156);
+          analogWrite(PWM2_PIN, PWM2_depth);
+          }
+      break;
   }
 }
 
 void update_keytrack(byte pitch) {
-
-    int noteDutyCycle;
 
     if (keytrack_on) {
         // Scale note value based on keytrack
@@ -176,7 +213,7 @@ void DinHandleNoteOn(byte channel, byte pitch, byte velocity) {
         update_keytrack(keytrack_pitch);
 
         // Set PWM duty cycle for velocity
-        int velocityDutyCycle = map(velocity, 0, 127, 0, 255);  // Map velocity to 8-bit range
+        velocityDutyCycle = map(velocity, 0, 127, 0, 256);  // Map velocity to 8-bit range
         analogWrite(VELOCITY_PWM_PIN, velocityDutyCycle);
 
         // Setup glide parameters
@@ -245,6 +282,11 @@ void loop() {
   modulation = (adcValue - ADC_CENTER) / float(ADC_CENTER);
   fmModulation = pow(2.0, modulation * FM_RANGE);
 
+  // Read PolyMod input
+  polymodValue = analogRead(ADC2_PIN);
+  polymodulation = (polymodValue - ADC_CENTER) / float(ADC_CENTER);
+  polyModulation = pow(2.0, polymodulation * PM_RANGE);
+
   // Handle glide if enabled
   unsigned long currentMillis = millis();
   if (isGliding && currentMillis - lastGlideUpdate >= 10) {   // Update every 10ms
@@ -266,24 +308,16 @@ void loop() {
   float intervalFrequency2 = currentGlideFrequency2 * pow(2.0, interval / 12.0);  // Apply interval as a semitone offset
 
   // Apply modulation and settings
-  frequency1 = currentGlideFrequency1 * oct_sw1 * bend_factor * fmModulation;
+  frequency1 = currentGlideFrequency1 * oct_sw1 * bend_factor * fmModulation * polyModulation;
   frequency2 = intervalFrequency2 * oct_sw2 * bend_factor * fmModulation - detune;
 
   squarewaveFrequency1 = frequency1 / 2.0;  // One octave below
-  squarewaveFrequency2 = frequency2 / 2.0;  // One octave below
 
   // Toggle GPIO 10 for square wave 1
   interval1 = 1000000.0 / squarewaveFrequency1;  // Microseconds per half-period
   if (micros() - lastToggle1 >= interval1) {
     digitalWrite(SUB_OUT1, !digitalRead(SUB_OUT1));  // Toggle pin
     lastToggle1 = micros();
-  }
-
-  // Toggle GPIO 11 for square wave 2
-  unsigned long interval2 = 1000000.0 / squarewaveFrequency2;  // Microseconds per half-period
-  if (micros() - lastToggle2 >= interval2) {
-    digitalWrite(SUB_OUT2, !digitalRead(SUB_OUT2));  // Toggle pin
-    lastToggle2 = micros();
   }
 
   // Update the AD9833 frequencies
