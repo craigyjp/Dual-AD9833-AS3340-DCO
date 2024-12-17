@@ -14,10 +14,10 @@ const int TRIANGLE = 0x2002;                // define the waveform when we end w
 #define PW1_PIN 8
 #define PW2_PIN 11
 
-#define PWM1_PIN 29
-#define PWM2_PIN 27
+#define PWM1_PIN 9
+#define PWM2_PIN 10
 
-#define SUB_OUT1 10
+#define SUB_OUT1 29
 
 #define VELOCITY_PWM_PIN 12 // PWM output for velocity
 #define NOTE_PWM_PIN 13     // PWM output for note value

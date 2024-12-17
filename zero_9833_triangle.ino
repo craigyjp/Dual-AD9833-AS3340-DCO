@@ -13,7 +13,7 @@ AD9833 Waveform Module
 #define SLOT_ONE 1
 
 AD9833 AD(5, 3, 2);   //  SW SPI over the HW SPI pins (UNO);
-AD9833 AD1(9, 3, 2);  //  SW SPI over the HW SPI pins (UNO);
+AD9833 AD1(27, 3, 2);  //  SW SPI over the HW SPI pins (UNO);
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
