@@ -3,14 +3,21 @@ const int SQUARE = 0x2028;                  // When we update the frequency, we 
 const int TRIANGLE = 0x2002;                // define the waveform when we end writing.    
 
 #define ADC0_PIN A0        // Define the ADC0 pin
+#define ADC2_PIN A2        // Define the ADC0 pin
 #define ADC_CENTER 2048    // Center of the ADC range for 1.65V (12-bit ADC)
 #define FM_RANGE 1.0       // Modulation range (1 octave up or down)
+#define PM_RANGE 1.0       // Modulation range (1 octave up or down)
 
 #define LED_PIN 6
 #define SYNC_PIN 7
 
+#define PW1_PIN 8
+#define PW2_PIN 11
+
+#define PWM1_PIN 29
+#define PWM2_PIN 27
+
 #define SUB_OUT1 10
-#define SUB_OUT2 11
 
 #define VELOCITY_PWM_PIN 12 // PWM output for velocity
 #define NOTE_PWM_PIN 13     // PWM output for note value
@@ -21,6 +28,12 @@ const int TRIANGLE = 0x2002;                // define the waveform when we end w
 unsigned long lastToggle1 = 0; // Timestamp for GPIO 10
 unsigned long lastToggle2 = 0; // Timestamp for GPIO 11
 
+int PW1_duty;
+int PW2_duty;
+int PWM1_depth;
+int PWM2_depth;
+int velocityDutyCycle;
+int noteDutyCycle;
 int detune = 0;
 int noteVal = 0;
 int interval = 0;
@@ -35,8 +48,11 @@ float squarewaveFrequency1 = 1.00;
 float squarewaveFrequency2 = 1.00;
 unsigned long interval1;
 int adcValue;
+int polymodValue;
 float modulation = 1.00;
 float fmModulation = 1.00;
+float polymodulation = 1.00;
+float polyModulation = 1.00;
 bool keytrack_on = false;
 int keytrack = 0;
 int keytrack_pitch = 0;

@@ -10,6 +10,7 @@ AD9833 Waveform Module
 #include <hardware/pwm.h>
 
 #define MIDI_CHANNEL 1
+#define SLOT_ONE 1
 
 AD9833 AD(5, 3, 2);   //  SW SPI over the HW SPI pins (UNO);
 AD9833 AD1(9, 3, 2);  //  SW SPI over the HW SPI pins (UNO);
@@ -158,28 +159,28 @@ void myControlChange(byte channel, byte control, byte value) {
       break;
 
       case 24:
-          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          if (SLOT_ONE == 1) {
           PW1_duty = map(value, 0, 127, 0, 256);
           analogWrite(PW1_PIN, PW1_duty);
           }
       break;
 
       case 25:
-          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          if (SLOT_ONE == 1) {
           PW2_duty = map(value, 0, 127, 0, 256);
           analogWrite(PW2_PIN, PW2_duty);
           }
       break;
 
       case 26:
-          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          if (SLOT_ONE == 1) {
           PWM1_depth = map(value, 0, 127, 0, 156);
           analogWrite(PWM1_PIN, PWM1_depth);
           }
       break;
 
       case 27:
-          if (MIDI_CHANNEL == 1 || MIDI_CHANNEL == 5) {
+          if (SLOT_ONE == 1) {
           PWM2_depth = map(value, 0, 127, 0, 156);
           analogWrite(PWM2_PIN, PWM2_depth);
           }
